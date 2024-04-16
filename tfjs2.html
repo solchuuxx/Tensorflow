@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--Load TensorFlow.js -->
+    <!-- Get latest version at https://github.com/tensorflow/tfjs -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+</head>
+<body>
+    <h1>TensorFLow.js Example</h1>
+    <p>Formula y = 2x + 6 </p>
+    <button onclick="learnLinear()">Entrenar Modelo</button>
+    <input id="input_value" type="number" placeholder="Ingrese un número">
+    <button onclick="predictValue()">Predecir</button>
+    <div id="output_field"></div>
+</body>
+<script>
+    let model;
+    async function learnLinear(){
+        model = tf.sequential();
+        model.add(tf.layers.dense({units: 1, inputShape: [1]}));
+
+        model.compile({
+            loss: 'meanSquaredError',
+            optimizer: 'sgd'
+        });
+
+        const xs = tf.tensor2d([-6, -4, -2, 0, 2, 4, 6, 8, 10], [9, 1]);
+        const ys = tf.tensor2d([-6, -2, 2, 6, 10, 14, 18, 22, 26], [9, 1]);
+
+        const surface = {name: 'Loss', tab: 'Training'};
+        const history = [];
+
+        //Visualización de perdida.
+        await model.fit(xs, ys, {
+            epochs: 250,
+            callbacks: {
+                onEpochEnd: (epoch, log) => {
+                    history.push(log);
+                    tfvis.show.history(surface,history, ['loss'])
+                }
+            }
+        })
+
+        document.getElementById('output_field').innerText = "";
+        alert("Modelo Entrenado");
+    }
+
+    function predictValue() {
+        let inputValue = document.getElementById('input_value').value;
+        let output = model.predict(tf.tensor2d([parseFloat(inputValue)], [1, 1]));
+        document.getElementById('output_field').innerText = "El valor predicho de Y es: " + output.dataSync()[0];
+    }
+</script>
+</html>
