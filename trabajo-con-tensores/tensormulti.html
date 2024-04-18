@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplicando tensores</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"></script>
+</head>
+<body>
+    <h1>Tensorflow.js practico</h1>
+    <script>
+    let numeros = [];
+    for(let i=0; i<10; i++) {
+        let row = [];
+        for(let j=0; j<10; j++) {
+            row.push(Math.floor(Math.random() * 9) + 1);
+        }
+        numeros.push(row);
+    }
+
+    const t1 = tf.tensor2d(numeros);
+    const t2 = tf.tensor2d(numeros);
+
+    console.log("Cantidad de tensores");
+    console.log(tf.memory().numTensors);
+    console.log("Memoria");
+    console.log(tf.memory().numBytes);
+
+    const op = tf.tidy(() => {
+    
+        const tensor = t1.mul(t2)
+        const transpuesta = t1.transpose()
+        t3 = t1.mul(tensor)
+        t4 = t1.mul(t3)
+
+
+        console.log('Tensores Tidy')
+        console.log(tf.memory().numTensors)
+        console.log("Memoria");
+        console.log(tf.memory().numBytes);
+
+        console.log('Tensores Originales')
+        t1.print();
+        console.log('Tensores multiplicados')
+        t4.print();
+        console.log('Transpuesta del tensor:')
+        transpuesta.print();
+    });
+
+    console.log('Cantidad de tensores finales');
+    console.log(tf.memory().numTensors);
+
+    console.log('Memoria final');
+    console.log(tf.memory().numBytes);
+    </script>
+</body>
+</html>
