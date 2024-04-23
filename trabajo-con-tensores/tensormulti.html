@@ -18,25 +18,23 @@
         numeros.push(row);
     }
 
-    const t1 = tf.tensor2d(numeros);
-    const t2 = tf.tensor2d(numeros);
-
     console.log("Cantidad de tensores");
     console.log(tf.memory().numTensors);
-    console.log("Memoria");
+    console.log("Memoria en bytes");
     console.log(tf.memory().numBytes);
 
     const op = tf.tidy(() => {
+        const t1 = tf.tensor2d(numeros);
+        const t2 = tf.tensor2d(numeros);
     
         const tensor = t1.mul(t2)
         const transpuesta = t1.transpose()
         t3 = t1.mul(tensor)
         t4 = t1.mul(t3)
 
-
         console.log('Tensores Tidy')
         console.log(tf.memory().numTensors)
-        console.log("Memoria");
+        console.log("Memoria en bytes");
         console.log(tf.memory().numBytes);
 
         console.log('Tensores Originales')

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de Toxicidad</title>
+</head>
+
+<body>
+    <h1>Modelo de Toxicidad</h1>
+    <p>Introduce una palabra o frase para verificar su toxicidad:</p>
+    <input type="text" id="textInput">
+    <button onclick="handleInput()">Verificar Toxicidad</button>
+
+    <!-- Importar TensorFlow.js y el modelo de toxicidad -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script> -->
+
+    <script src="./tensorflowcdn.js"></script>
+    <script src="./toxicitycdn.js"></script>
+
+    <script>
+        // Función para cargar el modelo y predecir la toxicidad
+        async function predictToxicity(text) {
+            const model = await toxicity.load();
+            const predictions = await model.classify(text);
+            return predictions;
+        }
+
+        // Función para manejar la entrada del usuario
+        async function handleInput() {
+            console.log('Verificando toxicidad...');
+            const textInput = document.getElementById('textInput').value;
+            const predictions = await predictToxicity(textInput);
+            console.log("se analizó los datos ingresados");
+            predictions.forEach(prediction => {
+                console.log(`${prediction.label}: ${prediction.results[0].match}`);
+                alert(`${prediction.label}: ${prediction.results[0].match}`);
+            });
+        }
+    </script>
+</body>
+
+</html>
