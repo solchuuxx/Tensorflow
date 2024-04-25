@@ -13,13 +13,16 @@
     <button onclick="handleInput()">analizar</button>
 
     <script>
+        //Funcion que agarra el texto y lo pasa al modelo
         async function handleInput(){
         // minimum positive prediction confidence
         // If this isn't passed, the default is 0.85
+        //Carga el modelo de toxicidad con un umbral de confianza de predicción positiva de 0.5
         const threshold = 0.5
         const sentences = document.getElementById('textInput').value;
         toxicity.load(threshold).then((model) => {
-  
+
+          //Devuelve las predicciones del modelo para el texto.
           model.classify(sentences).then((predictions) => {
             // semi-pretty-print results
             console.log(JSON.stringify(predictions, null, 2))
