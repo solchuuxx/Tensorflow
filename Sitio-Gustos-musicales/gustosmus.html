@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <h1>Califica tus bandas favoritas</h1>
+    <form id="form">
+      <button type="button" onclick="processVotes()">Procesar información</button>
+    </form>
+    <h2 id="results"></h2>
+    <script>
+        // Variables globales
+        const bands = [
+          'Nirvana',
+          'Nine Inch Nails',
+          'Backstreet Boys',
+          'N Sync',
+          'Night Club',
+          'Apashe',
+          'STP',
+        ]
+        const features = [
+          'Grunge',
+          'Rock',
+          'Industrial',
+          'Boy Band',
+          'Dance',
+          'Techno',
+        ]
+        const band_feats = tf.tensor([
+          [1, 1, 0, 0, 0, 0],
+          [1, 0, 1, 0, 0, 0],
+          [0, 0, 0, 1, 1, 0],
+          [0, 0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0, 1],
+          [0, 0, 1, 0, 0, 1],
+          [1, 1, 0, 0, 0, 0],
+        ])
+  
+        // Función para generar los elementos de entrada
+        function generateInputs() {
+          const form = document.getElementById('form')
+          bands.forEach((band, i) => {
+            const label = document.createElement('label')
+            label.setAttribute('for', `vote-${i}`)
+            label.innerText = band
+            form.appendChild(label)
+  
+            const input = document.createElement('input')
+            input.setAttribute('type', 'number')
+            input.setAttribute('id', `vote-${i}`)
+            input.setAttribute('name', `vote-${i}`)
+            input.setAttribute('min', '1')
+            input.setAttribute('max', '10')
+            form.appendChild(input)
+          })
+        }
+  
+        // Función para procesar las votaciones del usuario
+        function processVotes() {
+          const user_votes = []
+          bands.forEach((band, i) => {
+            const vote = document.getElementById(`vote-${i}`).value
+            user_votes.push(vote ? parseInt(vote) : 0)
+          })
+  
+          // Calcular las características favoritas del usuario
+          tf.tidy(() => {
+            const user_feats = tf.matMul(tf.tensor([user_votes]), band_feats)
+            const top_user_features = tf.topk(user_feats, features.length)
+            const top_genres = top_user_features.indices.arraySync()[0]
+            const rankedCategories = top_genres.map((v) => features[v])
+  
+            // Mostrar los resultados
+            document.getElementById('results').innerText = `Tus estilos de música favoritos son: ${rankedCategories.join(', ')}`
+          })
+        }
+
+        // Llamar a generateInputs cuando se carga la página
+        window.onload = generateInputs
+    </script>
+  </body>
+</html>
