@@ -3,6 +3,7 @@
 <head>
     <!--Load TensorFlow.js -->
     <!-- Get latest version at https://github.com/tensorflow/tfjs -->
+    <title>TensorFlow Perdida</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
 </head>
@@ -38,6 +39,7 @@
                 onEpochEnd: (epoch, log) => {
                     history.push(log);
                     tfvis.show.history(surface,history, ['loss'])
+                    console.log(history)
                 }
             }
         })
