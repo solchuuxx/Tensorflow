@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Título de la página -->
     <title>Modelo de toxicidad</title>
+    <!-- Importamos TensorFlow.js y el modelo de toxicidad -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity@1.2.2"></script>
   </head>
   <body>
-    <h2>
-        Modelo de toxicidad
-    </h2>
+    <!-- Título de la sección -->
+    <h2>Modelo de toxicidad</h2>
 
+    <!-- Campo de entrada para introducir el texto a analizar -->
     <input type="text" id="textInput">
+    <!-- Botón para iniciar el análisis del texto -->
     <button onclick="handleInput()">analizar</button>
 
     <script>
-        //Funcion que agarra el texto y lo pasa al modelo
+        // Función para manejar la entrada del usuario
         async function handleInput(){
-        // minimum positive prediction confidence
-        // If this isn't passed, the default is 0.85
-        //Carga el modelo de toxicidad con un umbral de confianza de predicción positiva de 0.5
+        // Umbral de confianza de predicción positiva
+        // Si no se pasa este valor, el valor por defecto es 0.85
         const threshold = 0.5
+        // Obtenemos el texto introducido por el usuario
         const sentences = document.getElementById('textInput').value;
+        // Cargamos el modelo de toxicidad con el umbral especificado
         toxicity.load(threshold).then((model) => {
 
-          //Devuelve las predicciones del modelo para el texto.
+          // Clasificamos el texto introducido por el usuario
           model.classify(sentences).then((predictions) => {
-            // semi-pretty-print results
+            // Imprimimos los resultados de la clasificación en la consola
             console.log(JSON.stringify(predictions, null, 2))
           })
         })

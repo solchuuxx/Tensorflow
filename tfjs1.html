@@ -1,40 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!--Load TensorFlow.js -->
-    <!-- Get latest version at https://github.com/tensorflow/tfjs -->
+    <!-- Cargamos TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"></script>
 </head>
 <body>
+    <!-- Título de la página -->
     <h1>TensorFLow.js Example</h1>
+    <!-- Fórmula que se va a aprender -->
     <p>Formula y = 2x + 6 </p>
+    <!-- Botón para iniciar el entrenamiento del modelo -->
     <button onclick="learnLinear()">Entrenar Modelo</button>
+    <!-- Campo de entrada para introducir un valor de x -->
     <input id="input_value" type="number" placeholder="Ingrese un número">
+    <!-- Botón para predecir el valor de y dado el valor de x introducido -->
     <button onclick="predictValue()">Predecir</button>
+    <!-- Campo donde se mostrará el resultado de la predicción -->
     <div id="output_field"></div>
 </body>
 <script>
+    // Definimos la variable del modelo
     let model;
+    // Función para entrenar el modelo
     async function learnLinear(){
+        // Creamos un modelo secuencial
         model = tf.sequential();
+        // Añadimos una capa densa al modelo
         model.add(tf.layers.dense({units: 1, inputShape: [1]}));
 
+        // Compilamos el modelo con una función de pérdida y un optimizador
         model.compile({
             loss: 'meanSquaredError',
             optimizer: 'sgd'
         });
 
+        // Definimos los datos de entrenamiento
         const xs = tf.tensor2d([-6, -4, -2, 0, 2, 4, 6, 8, 10], [9, 1]);
         const ys = tf.tensor2d([-6, -2, 2, 6, 10, 14, 18, 22, 26], [9, 1]);
 
+        // Entrenamos el modelo
         await model.fit(xs, ys, {epochs: 250});
+        // Limpiamos el campo de salida
         document.getElementById('output_field').innerText = "";
+        // Mostramos un mensaje de que el modelo ha sido entrenado
         alert("Modelo Entrenado");
     }
 
+    // Función para predecir el valor de y dado un valor de x
     function predictValue() {
+        // Obtenemos el valor de x del campo de entrada
         let inputValue = document.getElementById('input_value').value;
+        // Realizamos la predicción
         let output = model.predict(tf.tensor2d([parseFloat(inputValue)], [1, 1]));
+        // Mostramos el resultado de la predicción
         document.getElementById('output_field').innerText = "El valor predicho de Y es: " + output.dataSync()[0];
     }
 </script>

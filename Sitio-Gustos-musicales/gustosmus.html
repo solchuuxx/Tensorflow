@@ -1,39 +1,52 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Título de la página -->
     <title>Gustos musicales</title>
+    <!-- Importamos TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
   </head>
   <body>
+    <!-- Título de la página -->
     <h1>Califica tus bandas favoritas</h1>
+    <!-- Formulario para recoger las votaciones del usuario -->
     <form id="form">
+      <!-- Botón para procesar las votaciones -->
       <button type="button" onclick="processVotes()">Procesar información</button>
     </form>
+    <!-- Sección para mostrar los resultados -->
     <h2 id="results"></h2>
     <script>
+        // Definimos las bandas y sus características
         const bands = ['Nirvana', 'Nine Inch Nails', 'Backstreet Boys', 'N Sync', 'Night Club', 'Apashe', 'STP']
         const features = ['Grunge', 'Rock', 'Industrial', 'Boy Band', 'Dance', 'Techno']
         const band_feats = tf.tensor([
-          [1, 1, 0, 0, 0, 0],
-          [1, 0, 1, 0, 0, 0],
-          [0, 0, 0, 1, 1, 0],
-          [0, 0, 0, 1, 0, 0],
-          [0, 0, 1, 0, 0, 1],
-          [0, 0, 1, 0, 0, 1],
-          [1, 1, 0, 0, 0, 0],
+          [1, 1, 0, 0, 0, 0], // Nirvana
+          [1, 0, 1, 0, 0, 0], // Nine Inch Nails
+          [0, 0, 0, 1, 1, 0], // Backstreet Boys
+          [0, 0, 0, 1, 0, 0], // N Sync
+          [0, 0, 1, 0, 0, 1], // Night Club
+          [0, 0, 1, 0, 0, 1], // Apashe
+          [1, 1, 0, 0, 0, 0], // STP
         ])
 
+        // Cuando se carga la página, añadimos los campos de votación para cada banda
         window.onload = () => {
           bands.forEach((band, i) => {
             document.getElementById('form').innerHTML += `<label for="vote-${i}">${band}</label><input type="number" id="vote-${i}" name="vote-${i}" min="1" max="10">`
           })
         }
 
+        // Función para procesar las votaciones
         function processVotes() {
+          // Recogemos las votaciones del usuario
           const user_votes = bands.map((band, i) => parseInt(document.getElementById(`vote-${i}`).value) || 0)
           tf.tidy(() => {
+            // Calculamos las características del usuario a partir de sus votaciones
             const user_feats = tf.matMul(tf.tensor([user_votes]), band_feats)
+            // Obtenemos los géneros favoritos del usuario
             const top_genres = tf.topk(user_feats, features.length).indices.arraySync()[0]
+            // Mostramos los resultados
             document.getElementById('results').innerText = `Tus estilos de música favoritos son: ${top_genres.map((v) => features[v]).join(', ')}`
           })
         }

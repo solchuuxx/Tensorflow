@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manipulación de imágenes con TensorFlow.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+</head>
+<body>
+    <h1>Imagen original</h1>
+    <img id="original" src="imagen.jpg" onload="run()">
+
+    <h1>Imagen recortada</h1>
+    <canvas id="recortada"></canvas>
+
+    <h1>Imagen redimensionada (resize)</h1>
+    <canvas id="redimensionada"></canvas>
+
+    <h1>Imagen redimensionada (resizeBilinear)</h1>
+    <canvas id="redimensionadaBilinear"></canvas>
+
+    <h1>Imagen espejada</h1>
+    <canvas id="espejada"></canvas>
+
+    <script>
+    async function run() {
+        const img = document.getElementById('original');
+        let tensor = tf.browser.fromPixels(img).toFloat().div(tf.scalar(255));
+        
+        // Recortar la imagen
+        let recortada = tensor.slice([10, 10, 0], [100, 100, 3]);
+        await tf.browser.toPixels(recortada, document.getElementById('recortada'));
+
+        // Cambiar el tamaño de la imagen de manera simple
+        let redimensionada = tf.image.resizeNearestNeighbor(recortada, [200, 200]);
+        await tf.browser.toPixels(redimensionada, document.getElementById('redimensionada'));
+
+        // Cambiar el tamaño de la imagen con resizeBilinear
+        let redimensionadaBilinear = tf.image.resizeBilinear(recortada, [200, 200]);
+        await tf.browser.toPixels(redimensionadaBilinear, document.getElementById('redimensionadaBilinear'));
+
+        // Espejar la imagen
+        let espejada = tf.image.flipLeftRight(redimensionada.expandDims(0)).squeeze();
+        await tf.browser.toPixels(espejada, document.getElementById('espejada'));
+    }
+
+    window.onload = function() {
+            run();
+    };
+    </script>
+</body>
+</html>
