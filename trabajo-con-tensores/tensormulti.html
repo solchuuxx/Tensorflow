@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multiplicando tensores</title>
+    <!-- Importamos TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"></script>
 </head>
 <body>
     <h1>Tensorflow.js practico</h1>
     <script>
+    // Creamos una matriz de números aleatorios
     let numeros = [];
     for(let i=0; i<10; i++) {
         let row = [];
@@ -18,18 +20,24 @@
         numeros.push(row);
     }
 
+    // Realizamos operaciones con tensores dentro de un bloque tf.tidy para liberar automáticamente la memoria utilizada por los tensores intermedios
     const op = tf.tidy(() => {
+        // Creamos dos tensores a partir de la matriz de números
         let t1 = tf.tensor2d(numeros);
         let t2 = tf.tensor2d(numeros);
     
+        // Multiplicamos los tensores en un bucle hasta que el tamaño del tensor resultante sea mayor que 64MB
+        // Esto puede causar que el navegador se bloquee debido al consumo excesivo de memoria
         while(t1.dataSync().byteLength < 64 * 1024 * 1024) {
             t1 = t1.mul(t2);
         }
 
+        // Imprimimos el tensor final
         console.log('Tensor final')
         t1.print();
     });
 
+    // Imprimimos la cantidad de tensores y la memoria utilizada
     console.log('Cantidad de tensores finales');
     console.log(tf.memory().numTensors);
 
