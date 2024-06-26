@@ -2,107 +2,118 @@
 <html lang="es">
   <head>
     <meta charset="utf-8">
+    <!-- Enlace al archivo CSS de Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Inclusión de la biblioteca TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
   </head>
   <body class="container">
     <h1>Juego Ta te ti</h1>
     <p>Vos jugás con las X</p>
+    <!-- Creación de la cuadrícula de botones para el juego -->
     <div class="row gap-2">
       <div>
-        <button id="0" class="m-2 btn btn-outline-primary"></button>
-        <button id="1" class="m-2 btn btn-outline-primary"></button>
-        <button id="2" class="m-2 btn btn-outline-primary"></button>
+        <button id="0" class="m-2 btn btn-lg btn-warning"></button>
+        <button id="1" class="m-2 btn btn-lg btn-warning"></button>
+        <button id="2" class="m-2 btn btn-lg btn-warning"></button>
       </div>
       <div>
-        <button id="3" class="m-2 btn btn-outline-primary"></button>
-        <button id="4" class="m-2 btn btn-outline-primary"></button>
-        <button id="5" class="m-2 btn btn-outline-primary"></button>
+        <button id="3" class="m-2 btn btn-lg btn-warning"></button>
+        <button id="4" class="m-2 btn btn-lg btn-warning"></button>
+        <button id="5" class="m-2 btn btn-lg btn-warning"></button>
       </div>
       <div>
-        <button id="6" class="m-2 btn btn-outline-primary"></button>
-        <button id="7" class="m-2 btn btn-outline-primary"></button>
-        <button id="8" class="m-2 btn btn-outline-primary"></button>
+        <button id="6" class="m-2 btn btn-lg btn-warning"></button>
+        <button id="7" class="m-2 btn btn-lg btn-warning"></button>
+        <button id="8" class="m-2 btn btn-lg btn-warning"></button>
       </div>
+      <!-- Mensaje de turno y botón para jugar de nuevo -->
       <p id="turn">Empezá colocando la primera X.</p>
       <span id="new-play"  class="text-primary btn visually-hidden" onclick="newPlay()">Jugar de nuevo</span>
     </div>
 
     <script>
       const jugada = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-      const buttons = document.querySelectorAll("button");
-      const newPlayButton = document.getElementById("new-play");
-      const turn = document.getElementById("turn");
+      const buttons = document.querySelectorAll("button"); // Selecciona todos los botones del tablero
+      const newPlayButton = document.getElementById("new-play"); // Botón para jugar de nuevo
+      const turn = document.getElementById("turn"); // Elemento para mostrar el turno
 
+      // Asigna un evento de clic a cada botón
       buttons.forEach((button) => button.addEventListener("click", myPlay));
 
+      // Función para manejar la jugada del jugador
       function myPlay(e) {
         const button = e.target;
-        jugada[button.id] = 1;
-        button.textContent = "X";
-        buttons.forEach((button) => button.disabled = true);
-        const winMatch = winBoard(jugada);
-        if (winMatch) alertWinOrLose(winMatch);
+        jugada[button.id] = 1; // Marca la casilla con una X
+        button.textContent = "X"; // Muestra la X en el botón
+        buttons.forEach((button) => button.disabled = true); // Deshabilita los botones
+        const winMatch = winBoard(jugada); // Verifica si hay un ganador
+        if (winMatch) alertWinOrLose(winMatch); // Muestra el resultado
         else {
-          turn.textContent = "Turno de la máquina.";
-          setTimeout(playOfModel, 1000);
+          turn.textContent = "Turno de que juegue la máquina."; // Cambia el mensaje de turno
+          setTimeout(playOfModel, 1000); // Espera un segundo antes de que juegue la máquina
         }
       }
 
+      // Función para mostrar el resultado (ganar o perder)
       function alertWinOrLose(winMatch) {
-        if (winMatch === null) return turn.textContent = "Tu turno.";
-        turn.textContent = winMatch === 1 ? "Ganaste" : "Perdiste el juego, podes jugar de nuevo.";
-        newPlayButton.classList.remove("visually-hidden");
+        if (winMatch === null) return turn.textContent = "Tu turno."; // Empate = nadie gana
+        turn.textContent = winMatch === 1 ? "Ganaste" : "Perdiste el juego, si quieres podes jugar de nuevo.";
+        newPlayButton.classList.remove("visually-hidden"); // Muestra el botón para jugar de nuevo
       }
       
+      // Función para reiniciar el juego
       function newPlay(){
-        jugada.fill(0);
+        jugada.fill(0); // Reinicia el arreglo
         buttons.forEach((button) => {
-          button.textContent = "-";
-          button.disabled = false;
+          button.textContent = "-"; // Borra las X y O de los botones
+          button.disabled = false; // Habilita los botones
         });
       }
 
+      // Función para que la máquina juegue
       function playOfModel() {
         tf.ready().then(() => {
-          const modelPath = "model/ttt_model.json";
+          const modelPath = "model/ttt_model.json"; // Ruta al modelo entrenado
           tf.tidy(() => {
             tf.loadLayersModel(modelPath).then((model) => {
-              const play = tf.tensor(jugada);
-              const matches = tf.stack([play]);
-              const result = model.predict(matches);
-              result.print();
+              const play = tf.tensor(jugada); // Crea un tensor con la jugada actual
+              const matches = tf.stack([play]); // Apila el tensor
+              const result = model.predict(matches); // Realiza la predicción
+              result.print(); // Muestra el resultado en la consola (opcional)
               result.data().then((data) => {
                 const dataArr = Array.from(data);
                 const max = Math.max(...dataArr);
                 const index = dataArr.indexOf(max);
                 if (jugada[index] === 0) {
                   jugada[index] = -1;
-                  buttons[index].textContent = "O";
+                  buttons[index].textContent = "O"; // Muestra la O en el botón 
                 } else {
                   const emptyIndex = jugada.indexOf(0);
                   if (emptyIndex === -1) {
-                    turn.textContent = "Empate";
+                    turn.textContent = "Empate"; // No hay más casillas disponibles
                     play.dispose();
                     matches.dispose();
                   } else {
-                    jugada[emptyIndex] = -1;
-                    buttons[emptyIndex].textContent = "O";
+                    jugada[emptyIndex] = -1; // Marca la siguiente casilla con una O
+                    buttons[emptyIndex].textContent = "O"; // Muestra la O en el botón
                   }
                 }
-                const winMatch = winBoard(jugada);
+                const winMatch = winBoard(jugada); // Verifica si hay un ganador
                 alertWinOrLose(winMatch);
-                buttons.forEach((button) => button.disabled = false);
+                buttons.forEach((button) => button.disabled = false); // Habilita los botones
               });
             });
           });
         });
       }
-
+      
+      // Función para verificar si hay un ganador
       function winBoard(board) {
         const winStates = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
         for (let i = 0; i < winStates.length; i++) {
-          const [a, b, c] = winStates[i];
+          const [a, b, c] = winStates[i]; //Para cada combinación, extrae los índices de las casillas (variables a, b y c).
+          //Verifica si las casillas en esos índices tienen el mismo valor (X o O). Si sí, devuelve ese valor (1 o -1) como ganador
           if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
         }
         return null;
